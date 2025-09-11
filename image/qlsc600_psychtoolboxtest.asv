@@ -1,0 +1,48 @@
+
+
+%%
+
+try 
+    Screen('Preference', 'SkipSyncTests', 1)
+    whichScreen=0;
+    [window, rect]=Screen('OpenWindow', whichScreen, 128, [0 0 800 800]);
+
+    x=[-100:+100] ; y=[-120:+120] ; [X,Y] = meshgrid(x,y) ;
+    params = gabor_params ; params.orient = 60*pi/180 ;
+    
+    
+    
+    
+        %params.orient = (10*i+60)*pi/180 ;
+    
+    G = gabor(X,Y,params) ;
+    pg=(G/max(abs(G(:)))/2+0.5)*255;
+    tg=Screen('Maketexture',window,pg);
+    
+    AssertOpenGL
+   Screen('BlendFunction', window, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+ 
+   
+    Screen('Drawtexture',window,tg,[],[200 200 300 300],[],[],.15);
+    Screen('Flip',window)
+    WaitSecs(2)
+    Screen('Flip',window)
+    
+%     [a,b]=KbWait;find(b);
+    clear Screen
+    
+catch 
+ 
+    
+  
+    Screen('CloseAll');
+    clear Screen
+
+    rethrow(lasterror)
+    
+
+    
+end
+
+%%
+
