@@ -1,0 +1,17 @@
+trial,name,leftContrast,rightContrast,higherSide,keyName,key,rt,correct
+1,gen,0.25,0.35,right,LeftArrow,80,3.73025586900621,0
+2,gen,0.25,0.15,left,LeftArrow,80,3.1615466689982,1
+3,gen,0.2,0.3,right,RightArrow,79,3.52650841200375,1
+4,gen,0.325,0.375,right,LeftArrow,80,1.09096263800166,0
+5,gen,0.375,0.325,left,LeftArrow,80,0.965890400002536,1
+6,gen,0.34,0.26,left,LeftArrow,80,0.423350519995438,1
+7,gen,0.24,0.16,left,LeftArrow,80,0.276048400999571,1
+8,gen,0.4,0.3,left,LeftArrow,80,0.302387862000614,1
+9,gen,0.225,0.175,left,LeftArrow,80,0.666207930997189,1
+10,gen,0.275,0.225,left,RightArrow,79,1.2036781420029,0
+11,gen,0.21,0.29,right,RightArrow,79,0.789409723001882,1
+12,gen,0.225,0.275,right,RightArrow,79,0.815917195002839,1
+13,gen,0.325,0.375,right,RightArrow,79,0.867327277999721,1
+14,gen,0.39,0.31,left,RightArrow,79,0.629539506997389,0
+15,gen,0.275,0.325,right,RightArrow,79,1.65400225700432,1
+16,gen,0.39,0.31,left,RightArrow,79,0.811673353004153,0
