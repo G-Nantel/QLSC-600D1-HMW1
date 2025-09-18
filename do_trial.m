@@ -15,6 +15,10 @@ KbName('UnifyKeyNames');
 % ----- unpack positions -----
 leftX  = pos(1); rightX = pos(2); yPos = pos(3);
 
+% ----- front-face culling (robust default) -----
+frontCull = true;
+if isfield(P,'FRONT_CULL'), frontCull = logical(P.FRONT_CULL); end
+
 % ----- side assignment -----
 if rand < 0.5
     speedLeft  = P.refSpeed;   speedRight = testSpeed;  leftIsRef = true;
@@ -60,9 +64,7 @@ if spinUntilResp
         if isfield(P,'maxTrialSec') && elapsed > P.maxTrialSec
             DrawFormattedText(win, 'Time''s up - please answer.\n1 = Left, 2 = Right', ...
                               'center','center',0);
-            if ~isempty(progressStr)
-                DrawFormattedText(win, progressStr, 30, 30, 0);  % top-left
-            end
+            if ~isempty(progressStr), DrawFormattedText(win, progressStr, 30, 30, 0); end
             Screen('Flip', win);
             [rtAbs, keyCode] = KbWait;
             if keyCode(keyEsc), error('User aborted (ESC).'); end
@@ -79,17 +81,15 @@ if spinUntilResp
         Screen('FillRect', win, P.bgGray);
         Screen('FrameOval', win, 0, CenterRectOnPointd([0 0 2*P.sphereRadius 2*P.sphereRadius], leftX,  yPos), 2);
         Screen('FrameOval', win, 0, CenterRectOnPointd([0 0 2*P.sphereRadius 2*P.sphereRadius], rightX, yPos), 2);
-        drawSphereMeridians(win, leftX,  yPos, P.sphereRadius, P.nLines, angL, [0 0 0], 2, P.FRONT_CULL);
-        drawSphereLatitudes(win, rightX, yPos, P.sphereRadius, P.nLines, angR, [0 0 0], 2, P.FRONT_CULL);
+        drawSphereMeridians(win, leftX,  yPos, P.sphereRadius, P.nLines, angL, [0 0 0], 2, frontCull);
+        drawSphereLatitudes(win, rightX, yPos, P.sphereRadius, P.nLines, angR, [0 0 0], 2, frontCull);
 
         % HUD
         if ~isfield(P,'showHUD') || P.showHUD
             DrawFormattedText(win, '1 = LEFT   2 = RIGHT   (ESC to quit)', ...
                               'center', yPos + P.sphereRadius + 40, 0);
         end
-        if ~isempty(progressStr)
-            DrawFormattedText(win, progressStr, 30, 30, 0);  % top-left
-        end
+        if ~isempty(progressStr), DrawFormattedText(win, progressStr, 30, 30, 0); end
 
         Screen('Flip', win);
 
@@ -112,8 +112,8 @@ else
         Screen('FillRect', win, P.bgGray);
         Screen('FrameOval', win, 0, CenterRectOnPointd([0 0 2*P.sphereRadius 2*P.sphereRadius], leftX,  yPos), 2);
         Screen('FrameOval', win, 0, CenterRectOnPointd([0 0 2*P.sphereRadius 2*P.sphereRadius], rightX, yPos), 2);
-        drawSphereMeridians(win, leftX,  yPos, P.sphereRadius, P.nLines, angL, [0 0 0], 2, P.FRONT_CULL);
-        drawSphereLatitudes(win, rightX, yPos, P.sphereRadius, P.nLines, angR, [0 0 0], 2, P.FRONT_CULL);
+        drawSphereMeridians(win, leftX,  yPos, P.sphereRadius, P.nLines, angL, [0 0 0], 2, frontCull);
+        drawSphereLatitudes(win, rightX, yPos, P.sphereRadius, P.nLines, angR, [0 0 0], 2, frontCull);
         if ~isempty(progressStr), DrawFormattedText(win, progressStr, 30, 30, 0); end
         Screen('Flip', win);
     end

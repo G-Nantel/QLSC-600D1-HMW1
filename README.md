@@ -98,7 +98,21 @@ P.outDir = 'trial_csv';        % used only when writePerTrialCSV=true
 A corresponding MAT file with the same variables is also saved.
 
 ---
+## Outputs (auto-created):
 
+*  test_run_trials/<participant>_session_<stamp>.csv and .mat
+
+* visuals/<participant>_session_<stamp>.png (per-run psychometric curve)
+
+## Overlay all runs into one figure:
+
+* plot_all_sessions('test_run_trials', 'visuals');  % creates visuals/all_sessions_overlaid.png
+
+
+## Embed the overlay image in this README (GitHub Markdown supports images):
+
+ ![All sessions — proportion correct vs |Δ|](visuals/all_sessions_overlaid.png)
+---
 ## Analysis
 
 * Built-in plot: **Proportion correct vs |Δ|** (unsigned psychometric function).
@@ -114,3 +128,4 @@ A corresponding MAT file with the same variables is also saved.
 * **Motivation:** enable `P.showProgress` to show `answered/total` and percent done.
 
 ---
+

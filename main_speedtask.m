@@ -1,44 +1,33 @@
 function main_speedtask
-% MAIN_SPEEDTASK
-% - Loads params (config_speedtask.m)
-% - Opens PTB safely (auto-cleanup)
-% - Builds trial order (supports repeatsPerLevel OR trialsPerLevel)
-% - Runs do_trial(...) passing (t, nT) so a progress HUD can show "answered/total"
-% - Optionally writes per-trial CSVs if P.writePerTrialCSV==true
-% - ALWAYS writes one final session CSV + MAT at the end
-
 rng('shuffle');
 P = config_speedtask();
 
-AssertOpenGL;
-KbName('UnifyKeyNames');
-
+AssertOpenGL; KbName('UnifyKeyNames');
 [win, rect] = Screen('OpenWindow', P.whichScreen, P.bgGray, P.winRect);
 cleanupObj = onCleanup(@() cleanupPTB()); %#ok<NASGU>
 
 [xC, yC] = RectCenter(rect);
 Screen('BlendFunction', win, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-% Create per-trial folder only if needed
+% Ensure folders exist
+if ~exist(P.resultsDir,'dir'), mkdir(P.resultsDir); end
+if ~exist(P.visualsDir,'dir'), mkdir(P.visualsDir); end
 if isfield(P,'writePerTrialCSV') && P.writePerTrialCSV
-    if ~exist(P.outDir,'dir'); mkdir(P.outDir); end
+    if ~exist(P.outDir,'dir'), mkdir(P.outDir); end
 end
 
-% ---------------- Instructions ----------------
+% Instructions
 DrawFormattedText(win, ['Two spheres rotate.\n' ...
     '1 = LEFT faster,  2 = RIGHT faster.\nESC to quit.\n\nPress any key to start.'], ...
     'center','center',0);
-Screen('Flip', win);
-KbWait;
+Screen('Flip', win); KbWait;
 
-% ---------------- Trial order -----------------
+% Trial order (supports repeatsPerLevel OR trialsPerLevel)
 nLevels = numel(P.speedDiffs);
 if isfield(P,'repeatsPerLevel')
     assert(numel(P.repeatsPerLevel)==nLevels, 'repeatsPerLevel size mismatch');
     order = [];
-    for lvl = 1:nLevels
-        order = [order, repmat(lvl, 1, P.repeatsPerLevel(lvl))]; %#ok<AGROW>
-    end
+    for lvl = 1:nLevels, order = [order, repmat(lvl, 1, P.repeatsPerLevel(lvl))]; end %#ok<AGROW>
 elseif isfield(P,'trialsPerLevel')
     order = repelem(1:nLevels, P.trialsPerLevel);
 else
@@ -47,7 +36,7 @@ end
 order = order(randperm(numel(order)));
 nT    = numel(order);
 
-% ---------------- Session buffers -------------
+% Session buffers
 levelIdx      = zeros(nT,1);
 signedDiff    = zeros(nT,1);
 absDiff       = zeros(nT,1);
@@ -58,28 +47,24 @@ response      = zeros(nT,1);
 rt            = zeros(nT,1);
 correct       = zeros(nT,1);
 
-% Stimulus anchor positions
-leftX  = xC - 200;
-rightX = xC + 200;
-yPos   = yC;
+% Positions
+leftX = xC - 200; rightX = xC + 200; yPos = yC;
 
-% ---------------- Trials ----------------------
+% Trials
 for t = 1:nT
     lvl = order(t);
     testSpeed = P.refSpeed + P.speedDiffs(lvl);
 
-    % Run one trial (passing t and nT for progress HUD)
     R = do_trial(win, [leftX rightX yPos], P, lvl, testSpeed, t, nT);
 
-    % Optional per-trial CSV (off by default)
+    % Optional per-trial CSVs
     if isfield(P,'writePerTrialCSV') && P.writePerTrialCSV
-        if ~exist(P.outDir,'dir'); mkdir(P.outDir); end
         ts = char(datetime('now','Format','yyyyMMdd_HHmmss_SSS'));
         trialFile = fullfile(P.outDir, sprintf('%s_trial_%03d_%s.csv', P.participantID, t, ts));
         writetable(struct2table(R), trialFile);
     end
 
-    % Stash for final session outputs
+    % Stash for session outputs
     levelIdx(t)      = lvl;
     signedDiff(t)    = R.SignedDiff_rad_s;
     absDiff(t)       = abs(R.SignedDiff_rad_s);
@@ -91,21 +76,23 @@ for t = 1:nT
     correct(t)       = R.Correct;
 end
 
-% ---------------- Teardown & finalize ---------
 Screen('CloseAll'); clear Screen;
 
-% Single final CSV/MAT with a unique session name
-stamp      = char(datetime('now','Format','yyyyMMdd_HHmmss'));
-sessionCSV = sprintf('%s_session_%s.csv', P.participantID, stamp);
+% Unique session names & paths
+stamp       = char(datetime('now','Format','yyyyMMdd_HHmmss'));
+sessionBase = sprintf('%s_session_%s', P.participantID, stamp);
+sessionCSV  = fullfile(P.resultsDir, [sessionBase '.csv']);
+sessionPNG  = fullfile(P.visualsDir, [sessionBase '.png']);
 
-% finalize_session now accepts an optional outCSV; if you kept the older
-% signature, remove the last argument.
+% Save CSV/MAT and per-run figure into those folders
 finalize_session(levelIdx, signedDiff, absDiff, leftIsRef, ...
-                 speedLeftLog, speedRightLog, response, rt, correct, sessionCSV);
+                 speedLeftLog, speedRightLog, response, rt, correct, ...
+                 sessionCSV, sessionPNG);
+
+% (Optional) also refresh an overlay of ALL sessions' curves
+% plot_all_sessions(P.resultsDir, P.visualsDir);
 end
 
-% =============== local cleanup helper =================
 function cleanupPTB()
-    Screen('CloseAll');
-    clear Screen;
+    Screen('CloseAll'); clear Screen;
 end
