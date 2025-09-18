@@ -8,7 +8,7 @@ A minimal Psychtoolbox experiment where participants judge which of two rotating
 
 ---
 
-## Why this exists
+## Why we chose this
 
 * **Measure sensitivity** to small speed differences using an **unsigned psychometric function** (proportion correct vs |Δ|).
 * **Efficient design**: sample more densely near threshold; keep total trials modest (≈40–60) without losing curve quality.
