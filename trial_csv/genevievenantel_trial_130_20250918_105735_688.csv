@@ -1,0 +1,2 @@
+ParticipantID,Trial,ConditionIndex,ReferenceSpeed_rad_s,SignedDiff_rad_s,LeftHasReference,SpeedLeft_rad_s,SpeedRight_rad_s,Response,RT_s,Correct,Timestamp
+genevievenantel,130,1,3.14159265358979,0.26179938779915,1,3.14159265358979,3.40339204138894,2,0.44604270400032,1,20250918_105735_686
